@@ -46,6 +46,10 @@
         "virtualbox",
         "vlc",
         "wget",
+        "xorg-xev",
+        "xorg-xinput",
+        "xorg-xrandr",
+        "xorg-xrdb",
         "zsh"
     ],
     "aur-packages": [
@@ -55,6 +59,9 @@
     "symlinks": {
         "config-files/i3.conf": "~/.config/i3/config",
         "config-files/i3blocks.conf": "~/.config/i3blocks/config",
+        "config-files/screen-layout.service": "~/.config/systemd/user/screen-layout.service",
+        "config-files/screen-layout.sh": "/home/michael/.local/bin/screen-layout.sh",
+        "config-files/screen-layout.timer": "~/.config/systemd/user/screen-layout.timer",
         "config-files/zshrc": "~/.zshrc",
         "vendor/i3blocks-contrib": "~/.config/i3blocks/i3blocks-contrib"
     }

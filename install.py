@@ -80,6 +80,10 @@ class Environment:
         Remove a file or directory.
         """
         logger.debug("Removing %s", target)
+
+        if self.dry_run:
+            return
+
         if target.is_dir():
             shutil.rmtree(target)
         else:

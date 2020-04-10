@@ -1,0 +1,14 @@
+[Unit]
+Description=
+RefuseManualStart=no
+RefuseManualStop=no
+
+[Timer]
+Persistent=false
+OnStartupSec=1 second
+OnUnitActiveSec=2 seconds
+Unit=screen-layout.service
+AccuracySec=1 second
+
+[Install]
+WantedBy=timers.target
