@@ -8,10 +8,11 @@ __author__ = "Michael-F-Bryan <michaelfbryan@gmail.com>"
 
 from pathlib import Path
 import argparse
+import os
 from tempfile import TemporaryDirectory
 from argparse import ArgumentParser
 import logging
-from typing import TextIO, Iterable, List, Callable
+from typing import TextIO, Iterable, List, Callable, Tuple
 import json
 import subprocess
 from subprocess import CompletedProcess
@@ -23,13 +24,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def _set_log_level(verbosity: int):
+def get_log_level(verbosity: int) -> int:
     levels = {
         0: logging.WARN,
         1: logging.INFO,
         2: logging.DEBUG,
     }
-    logger.setLevel(levels.get(verbosity, logging.DEBUG))
+
+    return levels.get(verbosity, logging.DEBUG)
 
 
 class Environment:
@@ -37,10 +39,18 @@ class Environment:
     A helper for interacting with the outside environment.
     """
 
-    def __init__(self, dry_run: bool):
+    def __init__(self, dry_run: bool, log_level: int, dotfiles_root: Path):
         self.dry_run = dry_run
+        self.log_level = log_level
+        self.dotfiles_root = dotfiles_root
 
-    def subcommand(self, cmd: List[str], sudo=False, stdout=None) -> CompletedProcess:
+    @property
+    def quiet(self) -> bool:
+        return self.log_level > logging.INFO
+
+    def subcommand(
+        self, cmd: List[str], sudo=False, stdout=None, stderr=None
+    ) -> CompletedProcess:
         """
         Execute a shell command.
         """
@@ -52,7 +62,22 @@ class Environment:
         if self.dry_run:
             return CompletedProcess(cmd, 0)
         else:
-            return subprocess.run(cmd, stdout=stdout)
+            return subprocess.run(cmd, stdout=stdout, stderr=stderr)
+
+    def symlink(self, src: Path, dest: Path):
+        if not os.path.exists(dest.parent):
+            self.mkdir(dest.parent)
+
+        logger.debug("Linking %s → %s", src, dest)
+
+        if not self.dry_run:
+            os.symlink(src, dest, target_is_directory=src.is_dir())
+
+    def mkdir(self, dirname: Path):
+        logger.debug("Creating %s", dirname)
+
+        if not self.dry_run:
+            os.makedirs(dirname, exist_ok=True)
 
 
 def already_installed(package: str, env: Environment) -> bool:
@@ -75,30 +100,41 @@ def _str_install_with(packages: List[str], program: str) -> str:
     package_count = len(packages)
 
     if package_count == 1:
-        return f"install {packages[0]} with {program}"
+        return f"use {program} to install {packages[0]}"
     elif package_count < 5:
         comma_separated = ", ".join(packages)
-        return f"install {comma_separated } with {program}"
+        return f"use {program} to install {comma_separated}"
     else:
-        return f"Install {package_count} packages with {program}"
+        return f"Use {program} to install {package_count} packages"
 
 
-class PacmanInstall:
+class InstallPackages:
     """
-    Installs system packages using the official package manager.
+    Installs system packages using a pacman-like package manager.
     """
 
-    def __init__(self, packages: Iterable[str]):
+    def __init__(self, packages: Iterable[str], program: str, needs_sudo: bool):
         self.packages: List[str] = list(packages)
+        self.program = program
+        self.needs_sudo = needs_sudo
 
         if len(self.packages) == 0:
             raise ValueError("No packages specified")
 
     def __call__(self, env: Environment):
-        env.subcommand(["pacman", "--sync", "--needed"] + self.packages, sudo=True)
+        args = [self.program, "--sync", "--needed", "--noconfirm"]
+
+        if env.quiet:
+            args.append("--quiet")
+
+        args.extend(self.packages)
+
+        env.subcommand(
+            args, sudo=self.needs_sudo,
+        )
 
     def __str__(self) -> str:
-        return _str_install_with(self.packages, "pacman")
+        return _str_install_with(self.packages, self.program)
 
 
 class EnsureYayInstalled:
@@ -121,18 +157,34 @@ class EnsureYayInstalled:
             env.subcommand(["makepkg", "--syncdeps", "--install", "-p", str(pkgconfig)])
 
     def __str__(self):
-        return "Ensure the `yay` AUR helper is installed"
+        return "ensure the `yay` AUR helper is installed"
 
 
-class YayInstall:
-    def __init__(self, packages: Iterable[str]):
-        self.packages: List[str] = list(packages)
+class ApplySymlinks:
+    def __init__(self, links: Iterable[Tuple[str, str]]):
+        self.links = list(links)
 
     def __call__(self, env: Environment):
-        env.subcommand(["yay", "--sync", "--needed"] + self.packages)
+        for original, target in self.links:
+            src = env.dotfiles_root.joinpath(original)
+            dest = self.resolve(target)
+            env.symlink(src, dest)
+
+    def resolve(self, s: str) -> Path:
+        transforms = [os.path.expanduser, os.path.expandvars]
+
+        for transform in transforms:
+            s = transform(s)
+
+        return Path(s).resolve()
 
     def __str__(self) -> str:
-        return _str_install_with(self.packages, "yay")
+        num_links = len(self.links)
+
+        if num_links == 1:
+            return "apply 1 symlink"
+        else:
+            return f"apply {len(self.links)} symlinks"
 
 
 def compile_config(reader: TextIO) -> Iterable[Step]:
@@ -144,20 +196,29 @@ def compile_config(reader: TextIO) -> Iterable[Step]:
 
     arch_packages = raw.get("arch-packages")
     if arch_packages:
-        yield PacmanInstall(arch_packages)
+        yield InstallPackages(arch_packages, "pacman", True)
 
     aur_packages = raw.get("aur-packages")
     if aur_packages:
         yield EnsureYayInstalled()
-        yield YayInstall(aur_packages)
+        yield InstallPackages(aur_packages, "yay", False)
+
+    links = raw.get("symlinks")
+    if links:
+        yield ApplySymlinks(links.items())
 
 
-def main(config: TextIO, dry_run: bool):
-    env = Environment(dry_run)
+def main(config: TextIO, env: Environment):
+    steps = list(compile_config(config))
+    logger.info("Found %d steps after parsing the config", len(steps))
 
-    for step in compile_config(config):
-        logger.info("Beginning %s", step)
+    for step in steps:
+        logger.info('Beginning "%s"', step)
         step(env)
+
+
+def dotfiles_root() -> Path:
+    return Path(__file__).resolve().parent
 
 
 if __name__ == "__main__":
@@ -166,6 +227,7 @@ if __name__ == "__main__":
         "-n",
         "--dry-run",
         default=False,
+        action="store_true",
         help="Show all the commands which would be executed, but don't actually do anything.",
     )
     parser.add_argument(
@@ -182,10 +244,19 @@ if __name__ == "__main__":
         action="count",
         help="Generate detailed output, repeat for increased verbosity",
     )
+    parser.add_argument(
+        "-d",
+        "--dotfiles",
+        default=dotfiles_root(),
+        help="The dotfiles repository directory (default: %(default)s)",
+    )
     args = parser.parse_args()
 
-    _set_log_level(args.verbose)
+    log_level = get_log_level(args.verbose)
+    logger.setLevel(log_level)
     logger.info("Starting installation")
     logger.debug("Args: %s", vars(args))
 
-    main(args.config, args.dry_run)
+    env = Environment(args.dry_run, log_level, args.dotfiles)
+
+    main(args.config, env)
