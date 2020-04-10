@@ -19,6 +19,7 @@
         "i3blocks",
         "i3lock",
         "i3status",
+        "lastpass-cli",
         "lld",
         "llvm",
         "neovim",
@@ -46,6 +47,7 @@
         "virtualbox",
         "vlc",
         "wget",
+        "xclip",
         "xorg-xev",
         "xorg-xinput",
         "xorg-xrandr",
@@ -88,5 +90,14 @@
             "tokei",
             "watchexec"
         ]
+    },
+    "secrets": {
+        "username": "michaelfbryan@gmail.com",
+        "files": {
+            "SSH Keys": {
+                "id_rsa.txt": "~/.ssh/id_rsa",
+                "id_rsa.pub.txt": "~/.ssh/id_rsa.pub"
+            }
+        }
     }
 }
