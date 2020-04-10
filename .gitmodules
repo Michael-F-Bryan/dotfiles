@@ -1,3 +1,6 @@
 [submodule "vendor/i3blocks-contrib"]
 	path = vendor/i3blocks-contrib
 	url = https://github.com/vivien/i3blocks-contrib
+[submodule "vendor/oh-my-zsh"]
+	path = vendor/oh-my-zsh
+	url = https://github.com/ohmyzsh/ohmyzsh.git

@@ -70,7 +70,8 @@
         "config-files/zshrc": "~/.zshrc",
         "config-files/dunstrc": "~/.config/dunst/dunstrc",
         "config-files/Xresources": "~/.Xresources",
-        "vendor/i3blocks-contrib": "~/.config/i3blocks/i3blocks-contrib"
+        "vendor/i3blocks-contrib": "~/.config/i3blocks/i3blocks-contrib",
+        "vendor/oh-my-zsh": "~/.oh-my-zsh"
     },
     "rust": {
         "default-channel": "nightly",
