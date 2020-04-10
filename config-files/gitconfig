@@ -1,0 +1,29 @@
+[user]
+	email = michaelfbryan@gmail.com
+	name = Michael-F-Bryan
+	signingkey = 485995688BEC975DD9845461E9C602B0D9A998DC
+[push]
+	default = current
+[alias]
+	timeline = log --oneline --graph --decorate
+    cv = commit --all --verbose
+    get = pull --rebase
+
+[log]
+[format]
+    #pretty = format:%h %Cblue%ad%Creset %ae %Cgreen%s%Creset
+    shortlog = format:%C(auto,yellow)%h%C(auto,magenta)% G? %C(auto,blue)%>(12,trunc)%ad %C(auto,green)%<(7,trunc)%aN%C(auto,reset)%s%C(auto,red)% gD% D
+
+[pull]
+	rebase = true
+[core]
+	excludesfile = /home/michael/.gitignore
+[fetch]
+	prune = true
+[commit]
+	gpgsign = true
+[tag]
+	forceSignAnnotated = true
+
+[IncludeIf "gitdir:~/Documents/wintech-engineering/"]
+	path = "~/Documents/wintech-engineering/.gitconfig"
