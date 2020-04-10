@@ -9,6 +9,7 @@ __author__ = "Michael-F-Bryan <michaelfbryan@gmail.com>"
 from pathlib import Path
 import argparse
 import os
+import shutil
 from tempfile import TemporaryDirectory
 from argparse import ArgumentParser
 import logging
@@ -39,13 +40,17 @@ class Environment:
     A helper for interacting with the outside environment.
     """
 
-    def __init__(self, dry_run: bool, log_level: int, dotfiles_root: Path):
+    def __init__(self, dry_run: bool, log_level: int, dotfiles_root: Path, force: bool):
         self.dry_run = dry_run
         self.log_level = log_level
         self.dotfiles_root = dotfiles_root
+        self.force = force
 
     @property
     def quiet(self) -> bool:
+        """
+        Has the user asked for less detailed output?
+        """
         return self.log_level > logging.INFO
 
     def subcommand(
@@ -64,9 +69,43 @@ class Environment:
         else:
             return subprocess.run(cmd, stdout=stdout, stderr=stderr)
 
+    def is_okay_to_overwrite(self, target: Path) -> bool:
+        """
+        Is it okay to overwrite `target`?
+        """
+        return self.force
+
+    def remove(self, target: Path):
+        """
+        Remove a file or directory.
+        """
+        logger.debug("Removing %s", target)
+        if target.is_dir():
+            shutil.rmtree(target)
+        else:
+            os.remove(target)
+
     def symlink(self, src: Path, dest: Path):
+        """
+        Create a symbolic link from `src` to `dest`.
+
+        If the destination already exists, it will only be overwritten if
+        `self.is_okay_to_overwrite()` says it's okay (e.g. the `--force`
+        argument was provided at the command line).
+        """
         if not os.path.exists(dest.parent):
             self.mkdir(dest.parent)
+
+        if dest.exists():
+            if self.is_okay_to_overwrite(dest):
+                self.remove(dest)
+            else:
+                logger.warning(
+                    "Not symlinking %s → %s because it already exists (note: use the --force argument to continue anyway)",
+                    src,
+                    dest,
+                )
+                return
 
         logger.debug("Linking %s → %s", src, dest)
 
@@ -74,6 +113,9 @@ class Environment:
             os.symlink(src, dest, target_is_directory=src.is_dir())
 
     def mkdir(self, dirname: Path):
+        """
+        Make sure a directory exists.
+        """
         logger.debug("Creating %s", dirname)
 
         if not self.dry_run:
@@ -94,18 +136,6 @@ def already_installed(package: str, env: Environment) -> bool:
 
 
 Step = Callable[[Environment], None]
-
-
-def _str_install_with(packages: List[str], program: str) -> str:
-    package_count = len(packages)
-
-    if package_count == 1:
-        return f"use {program} to install {packages[0]}"
-    elif package_count < 5:
-        comma_separated = ", ".join(packages)
-        return f"use {program} to install {comma_separated}"
-    else:
-        return f"Use {program} to install {package_count} packages"
 
 
 class InstallPackages:
@@ -134,7 +164,15 @@ class InstallPackages:
         )
 
     def __str__(self) -> str:
-        return _str_install_with(self.packages, self.program)
+        package_count = len(self.packages)
+
+        if package_count == 1:
+            return f"use {self.program} to install {self.packages[0]}"
+        elif package_count < 5:
+            comma_separated = ", ".join(self.packages)
+            return f"use {self.program} to install {comma_separated}"
+        else:
+            return f"Use {self.program} to install {package_count} packages"
 
 
 class EnsureYayInstalled:
@@ -161,6 +199,11 @@ class EnsureYayInstalled:
 
 
 class ApplySymlinks:
+    """
+    Create symbolic links from something in the dotfiles directory to files on
+    disk.
+    """
+
     def __init__(self, links: Iterable[Tuple[str, str]]):
         self.links = list(links)
 
@@ -250,6 +293,13 @@ if __name__ == "__main__":
         default=dotfiles_root(),
         help="The dotfiles repository directory (default: %(default)s)",
     )
+    parser.add_argument(
+        "-f",
+        "--force",
+        default=False,
+        action="store_true",
+        help="Do things which may otherwise destroy data (e.g. overwriting files)",
+    )
     args = parser.parse_args()
 
     log_level = get_log_level(args.verbose)
@@ -257,6 +307,6 @@ if __name__ == "__main__":
     logger.info("Starting installation")
     logger.debug("Args: %s", vars(args))
 
-    env = Environment(args.dry_run, log_level, args.dotfiles)
+    env = Environment(args.dry_run, log_level, args.dotfiles, args.force)
 
     main(args.config, env)
