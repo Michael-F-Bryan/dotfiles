@@ -64,5 +64,28 @@
         "config-files/screen-layout.timer": "~/.config/systemd/user/screen-layout.timer",
         "config-files/zshrc": "~/.zshrc",
         "vendor/i3blocks-contrib": "~/.config/i3blocks/i3blocks-contrib"
+    },
+    "rust": {
+        "default-channel": "nightly",
+        "install": [
+            "cargo-tarpaulin",
+            "cbindgen",
+            "bindgen",
+            "cargo-crev",
+            "cargo-edit",
+            "cargo-expand",
+            "cargo-generate",
+            "cargo-outdated",
+            "cargo-release",
+            "cargo-update",
+            "cargo-watch",
+            "exa",
+            "mdbook",
+            "mdbook-linkcheck",
+            "powerline-rs",
+            "ripgrep",
+            "tokei",
+            "watchexec"
+        ]
     }
 }

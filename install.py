@@ -10,13 +10,15 @@ from pathlib import Path
 import argparse
 import os
 import shutil
-from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory, NamedTemporaryFile
 from argparse import ArgumentParser
 import logging
-from typing import TextIO, Iterable, List, Callable, Tuple
+from typing import TextIO, Iterable, List, Callable, Tuple, Optional, Set
 import json
 import subprocess
 from subprocess import CompletedProcess
+from urllib import request
+import re
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s [%(name)s]: %(message)s",
@@ -105,9 +107,7 @@ class Environment:
                 self.remove(dest)
             else:
                 logger.warning(
-                    "Not symlinking %s → %s because it already exists (note: use the --force argument to continue anyway)",
-                    src,
-                    dest,
+                    "Not symlinking %s → %s because it already exists", src, dest,
                 )
                 return
 
@@ -142,6 +142,18 @@ def already_installed(package: str, env: Environment) -> bool:
 Step = Callable[[Environment], None]
 
 
+def _packages_install_str(packages: List[str], program: str) -> str:
+    package_count = len(packages)
+
+    if package_count == 1:
+        return f"use {program} to install {packages[0]}"
+    elif package_count < 5:
+        comma_separated = ", ".join(packages)
+        return f"use {program} to install {comma_separated}"
+    else:
+        return f"Use {program} to install {package_count} packages"
+
+
 class InstallPackages:
     """
     Installs system packages using a pacman-like package manager.
@@ -168,15 +180,7 @@ class InstallPackages:
         )
 
     def __str__(self) -> str:
-        package_count = len(self.packages)
-
-        if package_count == 1:
-            return f"use {self.program} to install {self.packages[0]}"
-        elif package_count < 5:
-            comma_separated = ", ".join(self.packages)
-            return f"use {self.program} to install {comma_separated}"
-        else:
-            return f"Use {self.program} to install {package_count} packages"
+        return _packages_install_str(self.packages, self.program)
 
 
 class EnsureYayInstalled:
@@ -234,6 +238,119 @@ class ApplySymlinks:
             return f"apply {len(self.links)} symlinks"
 
 
+def which(program) -> Optional[Path]:
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = Path(path).joinpath(program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
+
+
+class EnsureRustIsInstalled:
+    url = "http://sh.rustup.rs/"
+
+    def __init__(self, default_channel: Optional[str] = None):
+        self.default_channel = default_channel
+
+    def __call__(self, env: Environment):
+        """
+        Do the equivalent of `curl http://sh.rustup.rs/ | sh
+        """
+        if self.already_installed():
+            logger.debug("Rust is already installed")
+            # return
+
+        logger.debug("Downloading %s and executing", self.url)
+
+        if env.dry_run:
+            return
+
+        with NamedTemporaryFile(suffix=".sh") as f, request.urlopen(
+            self.url
+        ) as response:
+            if response.status != 200:
+                raise Exception(
+                    f"Response failed with {response.status} {response.reason}"
+                )
+
+            shutil.copyfileobj(response, f)
+            f.flush()
+
+            self.call_rustup_sh(f.name, env)
+
+    def call_rustup_sh(self, filename: str, env: Environment):
+        args = ["sh", str(filename), "--", "-y", "--no-modify-path"]
+
+        if env.quiet:
+            args.append("--quiet")
+
+        if self.default_channel:
+            args.append("--default-toolchain")
+            args.append(self.default_channel)
+
+        env.subcommand(args)
+
+    def already_installed(self) -> bool:
+        return bool(which("rustup"))
+
+    def __str__(self):
+        return "ensure Rust is installed"
+
+
+class CargoInstall:
+    """
+    Install Rust packages using cargo.
+    """
+
+    def __init__(self, packages: Iterable[str]):
+        self.packages: Set[str] = set(packages)
+
+    def __call__(self, env: Environment):
+        args = ["cargo", "install"]
+
+        if env.force:
+            args.append("--force")
+            args.extend(self.packages)
+        else:
+            already_installed = set(self.get_installed_packages(env))
+            logger.debug("Cargo packages already installed: %s", already_installed)
+            to_install = self.packages.difference(already_installed)
+
+            if not to_install:
+                logger.info("Everything is already installed")
+                return
+
+            args.extend(to_install)
+
+        env.subcommand(args)
+
+    def get_installed_packages(self, env: Environment) -> Iterable[str]:
+        crates_toml = Path.home().joinpath(".cargo", ".crates.toml")
+
+        if not crates_toml.exists():
+            return
+
+        # a quick'n'dirty TOML parser for the v1 format
+
+        with open(crates_toml, "r") as f:
+            for line in f:
+                match = re.search(r'^"([\w\d_-]+)[^"]*"\s*=', line)
+                if match:
+                    yield match.group(1)
+
+    def __str__(self) -> str:
+        return _packages_install_str(list(self.packages), "cargo")
+
+
 def compile_config(reader: TextIO) -> Iterable[Step]:
     """
     Reads the configuration file and compiles it into a "recipe" which can be
@@ -254,6 +371,13 @@ def compile_config(reader: TextIO) -> Iterable[Step]:
     if links:
         yield ApplySymlinks(links.items())
 
+    rust = raw.get("rust")
+    if rust:
+        yield EnsureRustIsInstalled(rust.get("default-channel"))
+        install = rust.get("install")
+        if install:
+            yield CargoInstall(install)
+
 
 def main(config: TextIO, env: Environment):
     steps = list(compile_config(config))
@@ -271,25 +395,11 @@ def dotfiles_root() -> Path:
 if __name__ == "__main__":
     parser = ArgumentParser(description=__doc__)
     parser.add_argument(
-        "-n",
-        "--dry-run",
-        default=False,
-        action="store_true",
-        help="Show all the commands which would be executed, but don't actually do anything.",
-    )
-    parser.add_argument(
         "-c",
         "--config",
         default="config.json",
         type=argparse.FileType("r"),
         help="The configuration file to read from (default: %(default)s)",
-    )
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        default=0,
-        action="count",
-        help="Generate detailed output, repeat for increased verbosity",
     )
     parser.add_argument(
         "-d",
@@ -303,6 +413,20 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
         help="Do things which may otherwise destroy data (e.g. overwriting files)",
+    )
+    parser.add_argument(
+        "-n",
+        "--dry-run",
+        default=False,
+        action="store_true",
+        help="Show all the commands which would be executed, but don't actually do anything.",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        default=0,
+        action="count",
+        help="Generate detailed output, repeat for increased verbosity",
     )
     args = parser.parse_args()
 
