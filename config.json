@@ -63,6 +63,7 @@
         "config-files/screen-layout.sh": "/home/michael/.local/bin/screen-layout.sh",
         "config-files/screen-layout.timer": "~/.config/systemd/user/screen-layout.timer",
         "config-files/zshrc": "~/.zshrc",
+        "config-files/dunstrc": "~/.config/dunst/dunstrc",
         "vendor/i3blocks-contrib": "~/.config/i3blocks/i3blocks-contrib"
     },
     "rust": {
