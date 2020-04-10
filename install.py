@@ -286,7 +286,7 @@ class EnsureRustIsInstalled:
         """
         if self.already_installed():
             env.logger.debug("Rust is already installed")
-            # return
+            return
 
         env.logger.debug("Downloading %s and executing", self.url)
 
@@ -307,7 +307,7 @@ class EnsureRustIsInstalled:
             self.call_rustup_sh(f.name, env)
 
     def call_rustup_sh(self, filename: str, env: Environment):
-        args = ["sh", str(filename), "--", "-y", "--no-modify-path"]
+        args = ["sh", str(filename), "-y", "--no-modify-path"]
 
         if env.quiet:
             args.append("--quiet")
@@ -380,7 +380,9 @@ class CopySecretsToDisk:
 
         for secret, files in self.secrets.items():
             attachments = self.attachments(env, secret, files.keys())
-            env.logger.debug("Found %s", attachments)
+            env.logger.debug(
+                '"%s" has the following attachments: %s', secret, attachments
+            )
 
             for file, target in files.items():
                 attachment_id = attachments[file]
@@ -396,9 +398,7 @@ class CopySecretsToDisk:
         attachment_name: str,
         dest: Path,
     ):
-        env.logger.debug(
-            'Writing "%s" from "%s" to "%s"', attachment_name, secret, dest
-        )
+        env.logger.debug("Writing %s → %s", attachment_name, dest)
 
         if dest.exists() and not env.force:
             env.logger.warning(
@@ -434,7 +434,9 @@ class CopySecretsToDisk:
             return {file: "XXX" for file in files}
 
         else:
-            output = env.subcommand(["lpass", "show", secret])
+            output = env.subcommand(
+                ["lpass", "show", "--sync=auto", secret], stdout=subprocess.PIPE
+            )
             output.check_returncode()
             attachments = {}
 
@@ -443,7 +445,7 @@ class CopySecretsToDisk:
                 if not match:
                     continue
 
-                attachments[match.group(2).trim()] = match.group(1)
+                attachments[match.group(2).strip()] = match.group(1)
 
             return attachments
 
