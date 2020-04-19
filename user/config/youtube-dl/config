@@ -1,0 +1,5 @@
+--all-subs
+--embed-subs
+--add-metadata
+
+-o ~/Videos/%(uploader)s/%(title)s.%(ext)s

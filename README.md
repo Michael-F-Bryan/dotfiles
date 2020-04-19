@@ -34,7 +34,7 @@ optional arguments:
 The installation process is driven using the contents of
 [`config.json`](./config.json).
 
-## The Installation Process
+## The Config File
 
 When it reads in a [`config.json`](./config.json), the install script will
 create a "recipe" with steps based on the keys that are found.

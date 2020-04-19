@@ -11,9 +11,9 @@ current_state() {
 
 case $(current_state $external_hdmi) in
 	connected)
-		xrandr --output $laptop --primary --mode 1920x1080 --pos 0x1080 --rotate normal \
+		xrandr --output $laptop --primary --auto --rotate normal \
 		       --output $trackpad --off \
-		       --output $external_hdmi --mode 1920x1080 --pos 0x0 --rotate normal
+		       --output $external_hdmi --auto --above $laptop --rotate normal
 		i3-msg --quiet '[workspace=1] move workspace to HDMI-2'
 		i3-msg --quiet '[workspace=2] move workspace to output eDP-1'
 	;;
