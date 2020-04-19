@@ -103,35 +103,35 @@ class Environment:
         if self.dry_run:
             return
 
-        if target.is_dir():
+        if target.is_dir() and not target.is_symlink():
             shutil.rmtree(target)
         else:
             os.remove(target)
 
-    def symlink(self, src: Path, dest: Path):
+    def symlink(self, link: Path, target: Path):
         """
-        Create a symbolic link from `src` to `dest`.
+        Create a symbolic link from `link` to `target`.
 
         If the destination already exists, it will only be overwritten if
         `self.is_okay_to_overwrite()` says it's okay (e.g. the `--force`
         argument was provided at the command line).
         """
-        if not os.path.exists(dest.parent):
-            self.mkdir(dest.parent)
+        if not os.path.exists(link.parent):
+            self.mkdir(link.parent)
 
-        if dest.exists():
-            if self.is_okay_to_overwrite(dest):
-                self.remove(dest)
+        if link.is_symlink() or link.exists():
+            if self.is_okay_to_overwrite(link):
+                self.remove(link)
             else:
                 self.logger.warning(
-                    "Not symlinking %s → %s because it already exists", src, dest,
+                    "Not symlinking %s → %s because it already exists", link, target,
                 )
                 return
 
-        self.logger.debug("Linking %s → %s", src, dest)
+        self.logger.debug("Linking %s → %s", link, target)
 
         if not self.dry_run:
-            os.symlink(src, dest, target_is_directory=src.is_dir())
+            os.symlink(target, link, target_is_directory=target.is_dir())
 
     def mkdir(self, dirname: Path):
         """
@@ -229,7 +229,7 @@ def resolve_path(s: str) -> Path:
     for transform in transforms:
         s = transform(s)
 
-    return Path(s).resolve()
+    return Path(s)
 
 
 class ApplySymlinks:
@@ -243,9 +243,9 @@ class ApplySymlinks:
 
     def __call__(self, env: Environment):
         for original, target in self.links.items():
-            src = env.dotfiles_root.joinpath(original)
-            dest = resolve_path(target)
-            env.symlink(src, dest)
+            full_name = env.dotfiles_root.joinpath(original)
+            link = resolve_path(target)
+            env.symlink(link, full_name)
 
     def __str__(self) -> str:
         num_links = len(self.links)
