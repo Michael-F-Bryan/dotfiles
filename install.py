@@ -416,7 +416,10 @@ class CopySecretsToDisk:
     def _read_attachment(
         self, env: Environment, secret: str, attachment_id: str
     ) -> str:
-        outcome = env.subcommand(["lpass", "show", "--attach=" + attachment_id, secret])
+        outcome = env.subcommand(
+            ["lpass", "show", "--attach=" + attachment_id, secret],
+            stdout=subprocess.PIPE,
+        )
         outcome.check_returncode()
 
         return outcome.stdout
