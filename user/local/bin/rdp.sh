@@ -5,8 +5,7 @@ export PASSWORD=${PASSWORD:=Phone99Board}
 export GATEWAY=${GATEWAY:=remote.wintechengineering.com.au}
 export COMPUTER=${COMPUTER:=OFFICE26}
 
-export OPTIONS="/dynamic-resolution"
-export DISABLE="-aero"
+export OPTIONS="/dynamic-resolution /drive:michael,$HOME -aero"
 
 # Make sure a ctrl-c kills this script
 #trap exit SIGINT
@@ -18,19 +17,6 @@ log() {
 	tput sgr0
 }
 
-while true; do
-	log "\tLogging into $USERNAME@$COMPUTER via $GATEWAY"
-	echo
-	xfreerdp $OPTIONS $DISABLE /u:$USERNAME /p:$PASSWORD /g:$GATEWAY /v:$COMPUTER "$@"
-	exit_code="$?"
-
-	echo
-	log "Exited with $?"
-	echo
-
-	if [ "$exit_code" -eq 0 ]; then
-		exit
-	fi
-
-	sleep 2
-done
+log "\tLogging into $USERNAME@$COMPUTER via $GATEWAY"
+echo
+exec xfreerdp $OPTIONS /u:$USERNAME /p:$PASSWORD /g:$GATEWAY /v:$COMPUTER "$@"
