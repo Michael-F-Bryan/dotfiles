@@ -9,18 +9,18 @@ current_state() {
   xrandr | grep $output | awk '{ print $2 }'
 }
 
+xrandr --output $trackpad --off
+
 case $(current_state $external_hdmi) in
 	connected)
 		xrandr --output $laptop --primary --auto --rotate normal \
-		       --output $trackpad --off \
-		       --output $external_hdmi --auto --above $laptop --rotate normal
-		i3-msg --quiet '[workspace=1] move workspace to HDMI-2'
-		i3-msg --quiet '[workspace=2] move workspace to output eDP-1'
+		       --output $external_hdmi --auto --right-of $laptop --rotate normal
+		i3-msg --quiet "[workspace=1] move workspace to $external_hdmi"
+		i3-msg --quiet "[workspace=2] move workspace to output $laptop"
 	;;
 
 	disconnected)
 		xrandr --output $laptop --primary --mode 1920x1080 --pos 0x1080 --rotate normal \
-		       --output $trackpad --off \
 		       --output $external_hdmi --off
 	;;
 

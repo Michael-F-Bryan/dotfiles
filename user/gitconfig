@@ -27,3 +27,9 @@
 
 [IncludeIf "gitdir:~/Documents/wintech-engineering/"]
 	path = "~/Documents/wintech-engineering/.gitconfig"
+[IncludeIf "gitdir:~/Documents/hotg-ai/"]
+	path = "~/Documents/hotg-ai/.gitconfig"
+[rebase]
+	stat = true
+[init]
+	defaultBranch = master

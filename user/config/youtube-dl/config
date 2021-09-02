@@ -2,4 +2,4 @@
 --embed-subs
 --add-metadata
 
--o ~/Videos/%(uploader)s/%(title)s.%(ext)s
+-o ~/Videos/%(uploader)s/%(playlist)s/%(title)s.%(ext)s

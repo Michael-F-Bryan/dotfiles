@@ -34,6 +34,7 @@
         "pavucontrol",
         "python-pip",
         "python",
+        "rofi",
         "seahorse",
         "signal-desktop",
         "strace",
