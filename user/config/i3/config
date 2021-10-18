@@ -42,6 +42,9 @@ exec --no-startup-id feh --recursive --randomize --bg-fill ~/Pictures/Wallpapers
 # Start the USB manager
 exec --no-startup-id udiskie --tray
 
+# Move screens to the right place
+exec --no-startup-id ~/.local/bin/screen-layout.sh
+
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status pkill -RTMIN+10 i3blocks
 bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -q set Master 5%+ unmute && $refresh_i3status

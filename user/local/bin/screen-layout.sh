@@ -14,7 +14,7 @@ xrandr --output $trackpad --off
 case $(current_state $external_hdmi) in
 	connected)
 		xrandr --output $laptop --primary --auto --rotate normal \
-		       --output $external_hdmi --auto --right-of $laptop --rotate normal
+		       --output $external_hdmi --auto --above $laptop --rotate normal
 		i3-msg --quiet "[workspace=1] move workspace to $external_hdmi"
 		i3-msg --quiet "[workspace=2] move workspace to output $laptop"
 	;;

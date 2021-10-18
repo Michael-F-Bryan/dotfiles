@@ -44,7 +44,6 @@
         "ttf-inconsolata",
         "udiskie",
         "unrar",
-        "virtualbox-host-modules-arch",
         "virtualbox",
         "vlc",
         "wget",
@@ -57,7 +56,8 @@
     ],
     "aur-packages": [
         "skypeforlinux-stable-bin",
-        "visual-studio-code-bin"
+        "visual-studio-code-bin",
+	"autokey-gtk"
     ],
     "symlinks": {
         "user/config/dunst/dunstrc": "~/.config/dunst/dunstrc",
@@ -66,6 +66,7 @@
         "user/config/systemd/user/screen-layout.service": "~/.config/systemd/user/screen-layout.service",
         "user/config/systemd/user/screen-layout.timer": "~/.config/systemd/user/screen-layout.timer",
         "user/config/youtube-dl/config": "~/.config/youtube-dl/config",
+        "user/config/autokey": "~/.config/autokey",
         "user/gitconfig": "~/.gitconfig",
         "user/gitignore": "~/.gitignore",
         "user/local/bin/rdp.sh": "~/.local/bin/rdp",

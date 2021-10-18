@@ -51,6 +51,10 @@ export TERMINAL=alacritty
 eval `ssh-agent` >/dev/null
 
 # We want to disable incremental complation when using sccache
-if grep -Fq "sccache" ~/.cargo/config; then
+if cargo config get -Z unstable-options -- build.rustc-wrapper 2>/dev/null | grep -Fq "build.rustc-wrapper"; then
     export CARGO_INCREMENTAL=0
 fi
+
+# Prevents rust-analyzer from spawning infinite docker images
+# while compiling librunecoral
+export RUNECORAL_DIST_DIR=/home/michael/Documents/hotg-ai/librunecoral/dist
