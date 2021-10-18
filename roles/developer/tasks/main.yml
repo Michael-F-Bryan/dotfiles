@@ -1,0 +1,77 @@
+- name: Check if Rust is installed
+  shell: rustup --version
+  register: rust_installed
+  ignore_errors: true
+
+- name: Download Rustup Script
+  get_url:
+    url: https://sh.rustup.rs/
+    dest: /tmp/rustup.sh
+    mode: 0755
+  when: rust_installed.rc > 0
+
+- name: Run Rustup
+  shell: /tmp/rustup.sh -y
+  when: rust_installed.rc > 0
+
+- name: Discover installed packages
+  shell: cargo install --list
+  register: installed_packages
+
+- name: Install Common Programs from crates.io
+  shell: cargo install --verbose "{{ item }}"
+  loop:
+    - bindgen
+    - cargo-edit
+    - cargo-crev
+    - cargo-criterion
+    - cargo-expand
+    - cargo-generate
+    - cargo-outdated
+    - cargo-release
+    - cargo-update
+    - cargo-watch
+    - fd-find
+    - mdbook
+    - ripgrep
+    - sccache
+    - tokei
+    - watchexec-cli
+  when: not "{{ item }}" in installed_packages.stdout
+
+- name: Symlink Dotfiles
+  file:
+    src: "{{ inventory_dir }}/{{ item.from }}"
+    dest: "{{ ansible_env.HOME }}/{{ item.to }}"
+    state: link
+  loop:
+    - from: "user/config/dunst/dunstrc"
+      to: ".config/dunst/dunstrc"
+    - from: "user/config/i3/config"
+      to: ".config/i3/config"
+    - from: "user/config/i3blocks/config"
+      to: ".config/i3blocks/config"
+    - from: "user/config/systemd/user/screen-layout.service"
+      to: ".config/systemd/user/screen-layout.service"
+    - from: "user/config/systemd/user/screen-layout.timer"
+      to: ".config/systemd/user/screen-layout.timer"
+    - from: "user/config/youtube-dl/config"
+      to: ".config/youtube-dl/config"
+    - from: "user/config/autokey"
+      to: ".config/autokey"
+    - from: "user/gitconfig"
+      to: ".gitconfig"
+    - from: "user/gitignore"
+      to: ".gitignore"
+    - from: "user/local/bin/rdp.sh"
+      to: ".local/bin/rdp"
+    - from: "user/local/bin/screen-layout.sh"
+      to: ".local/bin/screen-layout.sh"
+    - from: "user/Xresources"
+      to: ".Xresources"
+    - from: "user/zshrc"
+      to: ".zshrc"
+    - from: "vendor/i3blocks-contrib"
+      to: ".config/i3blocks/i3blocks-contrib"
+    - from: "vendor/oh-my-zsh"
+      to: ".oh-my-zsh"

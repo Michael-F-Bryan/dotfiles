@@ -1,0 +1,6 @@
+- name: Setup local environment
+  hosts:
+    - all
+  roles:
+    - system
+    - developer
