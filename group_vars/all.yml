@@ -1,0 +1,110 @@
+system_packages:
+  - bazel
+  - blueman
+  - bluez-utils
+  - clang
+  - cmake
+  - dmenu
+  - docker
+  - dunst
+  - feh
+  - file-roller
+  - firefox
+  - freerdp
+  - git
+  - go
+  - htop
+  - hugo
+  - i3-wm
+  - i3blocks
+  - i3lock
+  - i3status
+  - lastpass-cli
+  - lld
+  - llvm
+  - neovim
+  - network-manager-applet
+  - networkmanager
+  - nmap
+  - noto-fonts-emoji
+  - noto-fonts-extra
+  - noto-fonts
+  - ntfs-3g
+  - obs-studio
+  - openssl
+  - pavucontrol
+  - python-pip
+  - python
+  - rofi
+  - seahorse
+  - signal-desktop
+  - strace
+  - thunar-volman
+  - thunar
+  - traceroute
+  - ttf-inconsolata
+  - udiskie
+  - unrar
+  - virtualbox
+  - vlc
+  - wget
+  - xclip
+  - xorg-xev
+  - xorg-xinput
+  - xorg-xrandr
+  - xorg-xrdb
+  - zsh
+
+cargo_package:
+  - bindgen
+  - cargo-edit
+  - cargo-crev
+  - cargo-criterion
+  - cargo-expand
+  - cargo-generate
+  - cargo-outdated
+  - cargo-release
+  - cargo-update
+  - cargo-watch
+  - fd-find
+  - mdbook
+  - ripgrep
+  - sccache
+  - tokei
+  - watchexec-cli
+
+symlinks:
+  - from: "user/config/dunst/dunstrc"
+    to: ".config/dunst/dunstrc"
+  - from: "user/config/i3/config"
+    to: ".config/i3/config"
+  - from: "user/config/i3blocks/config"
+    to: ".config/i3blocks/config"
+  - from: "user/config/systemd/user/screen-layout.service"
+    to: ".config/systemd/user/screen-layout.service"
+  - from: "user/config/systemd/user/screen-layout.timer"
+    to: ".config/systemd/user/screen-layout.timer"
+  - from: "user/config/youtube-dl/config"
+    to: ".config/youtube-dl/config"
+  - from: "user/config/autokey"
+    to: ".config/autokey"
+  - from: "user/gitconfig"
+    to: ".gitconfig"
+  - from: "user/wintech-engineering.gitconfig"
+    to: "Documents/wintech-engineering/.gitconfig"
+  - from: "user/hotg-ai.gitconfig"
+    to: "Documents/hotg-ai/.gitconfig"
+  - from: "user/gitignore"
+    to: ".gitignore"
+  - from: "user/local/bin/rdp.sh"
+    to: ".local/bin/rdp"
+  - from: "user/local/bin/screen-layout.sh"
+    to: ".local/bin/screen-layout.sh"
+  - from: "user/Xresources"
+    to: ".Xresources"
+  - from: "user/zshrc"
+    to: ".zshrc"
+  - from: "vendor/i3blocks-contrib"
+    to: ".config/i3blocks/i3blocks-contrib"
+  - from: "vendor/oh-my-zsh"
+    to: ".oh-my-zsh"
