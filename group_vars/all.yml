@@ -55,7 +55,7 @@ system_packages:
   - xorg-xrdb
   - zsh
 
-cargo_package:
+cargo_packages:
   - bindgen
   - cargo-edit
   - cargo-crev

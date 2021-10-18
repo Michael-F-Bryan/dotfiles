@@ -1,6 +1,6 @@
 - name: Create Dotfile Parent Directories
   file:
-    dest: "{{ ansible_env.HOME }}/{{ item.to | basename }}"
+    dest: "{{ ansible_env.HOME }}/{{ item.to | dirname }}"
     state: directory
   loop: "{{ symlinks }}"
 
