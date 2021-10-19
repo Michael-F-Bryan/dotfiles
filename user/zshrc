@@ -16,15 +16,8 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='nvim'
-else
-  export EDITOR='vim'
-fi
-
+export EDITOR='nvim'
 alias ls=exa
-alias sz="source ~/.zshrc"
 
 prompt() {
     PS1="$(powerline-rs --shell zsh $?)"
@@ -47,6 +40,9 @@ export NDK_HOME=$ANDROID_HOME/ndk/22.1.7171670
 [ -f /home/michael/.travis/travis.sh ] && source /home/michael/.travis/travis.sh
 
 export TERMINAL=alacritty
+
+# Let GPG know which TTY it is used by
+export GPG_TTY=$(tty)
 
 eval `ssh-agent` >/dev/null
 

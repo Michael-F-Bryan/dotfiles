@@ -66,8 +66,10 @@ cargo_packages:
   - cargo-release
   - cargo-update
   - cargo-watch
+  - exa
   - fd-find
   - mdbook
+  - powerline-rs
   - ripgrep
   - sccache
   - tokei
@@ -108,3 +110,4 @@ symlinks:
     to: ".config/i3blocks/i3blocks-contrib"
   - from: "vendor/oh-my-zsh"
     to: ".oh-my-zsh"
+    permissions: "u=rw,g=r,o=r"

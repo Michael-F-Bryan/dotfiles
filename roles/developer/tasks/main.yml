@@ -9,10 +9,11 @@
     src: "{{ inventory_dir }}/{{ item.from }}"
     dest: "{{ ansible_env.HOME }}/{{ item.to }}"
     state: link
+    mode: "{{ item.permissions | default(omit) }}"
   loop: "{{ symlinks }}"
 
 - name: Check if Rust is installed
-  shell: rustup --version
+  shell: zsh -c "rustup --version"
   register: rust_installed
   ignore_errors: true
 
@@ -24,14 +25,14 @@
   when: rust_installed.rc > 0
 
 - name: Run Rustup
-  shell: /tmp/rustup.sh -y
+  shell: zsh -c "/tmp/rustup.sh -y"
   when: rust_installed.rc > 0
 
 - name: Discover installed packages
-  shell: cargo install --list
+  shell: zsh -c "cargo install --list"
   register: installed_packages
 
 - name: Install Common Programs from crates.io
-  shell: cargo install --verbose "{{ item }}"
+  shell: zsh -c 'cargo install --verbose "{{ item }}"'
   loop: "{{ cargo_packages }}"
   when: not item in installed_packages.stdout
