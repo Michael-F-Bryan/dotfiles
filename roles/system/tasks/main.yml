@@ -3,3 +3,34 @@
     name: "{{ system_packages }}"
     state: present
   become: true
+
+- name: Check if Yay is installed
+  shell: yay --version
+  register: yay_installed
+  ignore_errors: true
+
+- name: Fetch Bootstrap Binary for Yay
+  ansible.builtin.unarchive: 
+    src: https://github.com/Jguer/yay/releases/download/v11.0.2/yay_11.0.2_x86_64.tar.gz
+    dest: /tmp/
+    remote_src: true
+  when: yay_installed.rc > 0
+
+- name: Install Yay Using Itself
+  command: /tmp/yay_11.0.2_x86_64/yay -S yay --answerdiff=None --answerclean=None --answeredit=None -y --noprovides
+  when: yay_installed.rc > 0
+
+- name: Install AUR Packages
+  community.general.pacman:
+    executable: yay
+    name: "{{ aur_packages }}"
+    state: present
+    extra_args: --answerdiff=None --answerclean=None --answeredit=None -y --noprovides
+
+- name: Enable Services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop: "{{ enabled_services }}"
+  become: true

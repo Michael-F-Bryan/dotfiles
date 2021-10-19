@@ -62,7 +62,7 @@ interval=5
 # The type defaults to "mem" if the instance is not specified.
 [memory]
 label=MEM 
-interval=10
+interval=5
 
 # Disk usage
 #
@@ -98,7 +98,7 @@ interval=10
 # The battery instance defaults to 0.
 [battery]
 label=⚡
-interval=30
+interval=10
 
 # Temperature
 #

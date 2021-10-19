@@ -1,9 +1,12 @@
 system_packages:
+  - accountsservice
   - bazel
+  - base-devel
   - blueman
   - bluez-utils
   - clang
   - cmake
+  - deepin-screenshot
   - dmenu
   - docker
   - dunst
@@ -20,6 +23,8 @@ system_packages:
   - i3lock
   - i3status
   - lastpass-cli
+  - lightdm
+  - lightdm-gtk-greeter
   - lld
   - llvm
   - neovim
@@ -33,6 +38,10 @@ system_packages:
   - obs-studio
   - openssl
   - pavucontrol
+  - pkg-config
+  - pulseaudio
+  - pulseaudio-bluetooth
+  - pulseaudio-alsa
   - python-pip
   - python
   - rofi
@@ -42,6 +51,7 @@ system_packages:
   - thunar-volman
   - thunar
   - traceroute
+  - tree
   - ttf-inconsolata
   - udiskie
   - unrar
@@ -53,7 +63,16 @@ system_packages:
   - xorg-xinput
   - xorg-xrandr
   - xorg-xrdb
+  - youtube-dl
   - zsh
+
+aur_packages:
+  - visual-studio-code-bin
+  - autokey-gtk
+  - google-chrome
+  - teams
+  - yay
+  - google-earth-pro
 
 cargo_packages:
   - bindgen
@@ -74,6 +93,13 @@ cargo_packages:
   - sccache
   - tokei
   - watchexec-cli
+
+enabled_services:
+  - NetworkManager.service
+  - lightdm.service
+  - bluetooth.service
+  - sshd.service
+  - systemd-resolved.service
 
 symlinks:
   - from: "user/config/dunst/dunstrc"
