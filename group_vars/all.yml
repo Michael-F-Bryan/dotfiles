@@ -1,12 +1,13 @@
 system_packages:
   - accountsservice
-  - bazel
   - base-devel
+  - bazel
   - blueman
   - bluez-utils
   - clang
   - cmake
   - deepin-screenshot
+  - deno
   - dmenu
   - docker
   - dunst
@@ -31,25 +32,25 @@ system_packages:
   - network-manager-applet
   - networkmanager
   - nmap
+  - noto-fonts
   - noto-fonts-emoji
   - noto-fonts-extra
-  - noto-fonts
   - ntfs-3g
   - obs-studio
   - openssl
   - pavucontrol
   - pkg-config
   - pulseaudio
-  - pulseaudio-bluetooth
   - pulseaudio-alsa
-  - python-pip
+  - pulseaudio-bluetooth
   - python
+  - python-pip
   - rofi
   - seahorse
   - signal-desktop
   - strace
-  - thunar-volman
   - thunar
+  - thunar-volman
   - traceroute
   - tree
   - ttf-inconsolata
@@ -67,18 +68,18 @@ system_packages:
   - zsh
 
 aur_packages:
-  - visual-studio-code-bin
   - autokey-gtk
   - google-chrome
-  - teams
-  - yay
   - google-earth-pro
+  - teams
+  - visual-studio-code-bin
+  - yay
 
 cargo_packages:
   - bindgen
-  - cargo-edit
   - cargo-crev
   - cargo-criterion
+  - cargo-edit
   - cargo-expand
   - cargo-generate
   - cargo-outdated
@@ -95,9 +96,9 @@ cargo_packages:
   - watchexec-cli
 
 enabled_services:
-  - NetworkManager.service
-  - lightdm.service
   - bluetooth.service
+  - lightdm.service
+  - NetworkManager.service
   - sshd.service
   - systemd-resolved.service
 
@@ -108,6 +109,8 @@ symlinks:
     to: ".config/i3/config"
   - from: "user/config/i3blocks/config"
     to: ".config/i3blocks/config"
+  - from: "user/config/alacritty/alacritty.yml"
+    to: ".config/alacritty/alacritty.yml"
   - from: "user/config/systemd/user/screen-layout.service"
     to: ".config/systemd/user/screen-layout.service"
   - from: "user/config/systemd/user/screen-layout.timer"
