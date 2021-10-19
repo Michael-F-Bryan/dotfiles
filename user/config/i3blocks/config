@@ -25,7 +25,7 @@
 # The top properties below are applied to every block, but can be overridden.
 # Each block command defaults to the script name to avoid boilerplate.
 # Change $SCRIPT_DIR to the location of your scripts!
-SCRIPT_DIR=/home/michael/.config/i3blocks/i3blocks-contrib
+SCRIPT_DIR=$HOME/.config/i3blocks/i3blocks-contrib
 command=$SCRIPT_DIR/$BLOCK_NAME/$BLOCK_NAME
 separator_block_width=15
 markup=none
@@ -61,7 +61,7 @@ interval=5
 #
 # The type defaults to "mem" if the instance is not specified.
 [memory]
-label=MEM 
+label=MEM
 interval=5
 
 # Disk usage
@@ -71,12 +71,12 @@ interval=5
 # (defaults to 10 for 10%).
 [disk]
 separator=false
-label=/   
+label=/
 DIR=/
 interval=30
 
 [disk]
-label=/home 
+label=/home
 interval=30
 
 # CPU usage
@@ -90,7 +90,7 @@ min_width=CPU 100.00%
 #separator=false
 
 [load_average]
-label=LOAD 
+label=LOAD
 interval=10
 
 # Battery indicator

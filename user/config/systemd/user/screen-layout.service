@@ -3,7 +3,7 @@ Description=Run the screen layout script to automatically move workspaces to the
 
 [Service]
 Type=simple
-ExecStart=/home/michael/.local/bin/screen-layout.sh
+ExecStart=%h/.local/bin/screen-layout.sh
 
 [Install]
 WantedBy=default.target

@@ -28,6 +28,7 @@ system_packages:
   - lightdm-gtk-greeter
   - lld
   - llvm
+  - man-pages
   - neovim
   - network-manager-applet
   - networkmanager

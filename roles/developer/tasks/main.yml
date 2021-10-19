@@ -9,7 +9,6 @@
     src: "{{ inventory_dir }}/{{ item.from }}"
     dest: "{{ ansible_env.HOME }}/{{ item.to }}"
     state: link
-    mode: "{{ item.permissions | default(omit) }}"
   loop: "{{ symlinks }}"
 
 - name: Check if Rust is installed
