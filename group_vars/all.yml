@@ -9,6 +9,7 @@ system_packages:
   - cmake
   - deepin-screenshot
   - deno
+  - dnsutils
   - dmenu
   - docker
   - dunst
