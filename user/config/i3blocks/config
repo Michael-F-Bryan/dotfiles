@@ -25,7 +25,7 @@
 # The top properties below are applied to every block, but can be overridden.
 # Each block command defaults to the script name to avoid boilerplate.
 # Change $SCRIPT_DIR to the location of your scripts!
-SCRIPT_DIR=$HOME/.config/i3blocks/i3blocks-contrib
+SCRIPT_DIR=/usr/lib/i3blocks
 command=$SCRIPT_DIR/$BLOCK_NAME/$BLOCK_NAME
 separator_block_width=15
 markup=none
@@ -34,34 +34,25 @@ markup=none
 label=♪
 interval=once
 signal=10
-# override BLOCK_BUTTON so clicking does nothing
-command=BLOCK_BUTTON='' $SCRIPT_DIR/$BLOCK_NAME/$BLOCK_NAME
 
 # Network interface monitoring
 #
 # If the instance is not specified, use the interface used for default route.
 # The address can be forced to IPv4 or IPv6 with -4 or -6 switches.
 [iface]
-#IFACE=wlan0
 color=#00FF00
 interval=10
 separator=false
 
-#[wifi]
-#INTERFACE=wlp3s0
-#label=wifi:
-#interval=10
-#separator=false
-#
 [bandwidth]
-#INTERFACE=eth0
+INTERFACE=wlp5s0
 interval=5
 
 # Memory usage
 #
 # The type defaults to "mem" if the instance is not specified.
 [memory]
-label=MEM
+label=MEM:
 interval=5
 
 # Disk usage
@@ -71,26 +62,31 @@ interval=5
 # (defaults to 10 for 10%).
 [disk]
 separator=false
-label=/
+label=/:
 DIR=/
 interval=30
 
 [disk]
-label=/home
+label=/mnt:
+DIR=/mnt
 interval=30
+
+#[disk]
+#label=/home
+#interval=30
 
 # CPU usage
 #
 # The script may be called with -w and -c switches to specify thresholds,
 # see the script for details.
 [cpu_usage]
-label=CPU
+label=CPU:
 interval=10
 min_width=CPU 100.00%
-#separator=false
+separator=false
 
 [load_average]
-label=LOAD
+label=LOAD:
 interval=10
 
 # Battery indicator

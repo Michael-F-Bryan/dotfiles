@@ -1,5 +1,6 @@
 system_packages:
   - accountsservice
+  - alsa-utils
   - base-devel
   - bazel
   - blueman
@@ -17,6 +18,7 @@ system_packages:
   - freerdp
   - git
   - go
+  - gtk2
   - htop
   - hugo
   - i3-wm
@@ -72,6 +74,7 @@ aur_packages:
   - autokey-gtk
   - google-chrome
   - google-earth-pro
+  - i3blocks-contrib
   - teams
   - visual-studio-code-bin
   - yay
@@ -87,6 +90,7 @@ cargo_packages:
   - cargo-release
   - cargo-update
   - cargo-watch
+  - cross
   - exa
   - fd-find
   - mdbook
@@ -136,8 +140,6 @@ symlinks:
     to: ".Xresources"
   - from: "user/zshrc"
     to: ".zshrc"
-  - from: "vendor/i3blocks-contrib"
-    to: ".config/i3blocks/i3blocks-contrib"
   - from: "vendor/oh-my-zsh"
     to: ".oh-my-zsh"
     permissions: "u=rw,g=r,o=r"
