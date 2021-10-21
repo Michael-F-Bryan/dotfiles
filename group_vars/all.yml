@@ -13,6 +13,7 @@ system_packages:
   - dmenu
   - docker
   - dunst
+  - eog
   - feh
   - file-roller
   - firefox
