@@ -1,9 +1,6 @@
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-export LANG=en_AU.UTF-8
-export LC_ALL=$LANG
-
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -37,6 +34,7 @@ export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$PATH:$HOME/.dotnet/tools
 
 export ANDROID_HOME=$HOME/Android/Sdk
+export ANDROID_SDK_ROOT=$ANDROID_HOME
 export NDK_HOME=$ANDROID_HOME/ndk/22.1.7171670
 
 # added by travis gem

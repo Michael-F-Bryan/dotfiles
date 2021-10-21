@@ -59,6 +59,7 @@ system_packages:
   - ttf-inconsolata
   - udiskie
   - unrar
+  - usbutils
   - virtualbox
   - vlc
   - wget
@@ -90,6 +91,7 @@ cargo_packages:
   - cargo-release
   - cargo-update
   - cargo-watch
+  - cbindgen
   - cross
   - exa
   - fd-find
