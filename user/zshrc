@@ -30,14 +30,20 @@ export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$PATH
 export PATH=$HOME/.yarn/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
-export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$PATH:$HOME/.dotnet/tools
+
+# Note: Wasmer needs to be before cargo so we always use dev versions of wapm
+# and friends
+export WASMER_DIR="/home/consulting/.wasmer"
+[ -s "$WASMER_DIR/wasmer.sh" ] && source "$WASMER_DIR/wasmer.sh"
+
+source "$HOME/.cargo/env"
+
+# This makes sure we prefer to complete Cargo.toml over Cargo.lock
+export FIGNORE=argo.lock
 
 # Set up the android NDK variables
 source /etc/profile.d/android-ndk.sh
-
-# added by travis gem
-[ -f $HOME/.travis/travis.sh ] && source $HOME/.travis/travis.sh
 
 export TERMINAL=alacritty
 
@@ -51,9 +57,12 @@ if cargo config get -Z unstable-options -- build.rustc-wrapper 2>/dev/null | gre
     export CARGO_INCREMENTAL=0
 fi
 
-# Prevents rust-analyzer from spawning infinite docker images
-# while compiling librunecoral
-export RUNECORAL_DIST_DIR=$HOME/Documents/hotg-ai/librunecoral/dist
+# Used by wit-bindgen
+export WASI_SDK_PATH=/opt/wasi-sdk
 
-# Load NVM
-[ -f /usr/share/nvm/init-nvm.sh ] && source /usr/share/nvm/init-nvm.sh
+# Liveshare uses .NET and for some reason it can't find a valid ICU package
+export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+
+# Set up completions for the asdf version manager
+[ -f /opt/asdf-vm/asdf.sh ] && source /opt/asdf-vm/asdf.sh 
+
