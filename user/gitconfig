@@ -1,7 +1,7 @@
 [user]
         email = michaelfbryan@gmail.com
         name = Michael-F-Bryan
-        signingkey = 485995688BEC975DD9845461E9C602B0D9A998DC
+	signingkey = 485995688BEC975DD9845461E9C602B0D9A998DC
 [push]
         default = current
 [alias]
@@ -29,6 +29,8 @@
         path = "~/Documents/wintech-engineering/.gitconfig"
 [IncludeIf "gitdir:~/Documents/hotg-ai/"]
         path = "~/Documents/hotg-ai/.gitconfig"
+[IncludeIf "gitdir:~/Documents/wasmer/"]
+        path = "~/Documents/wasmer/.gitconfig"
 [rebase]
         stat = true
 [init]
@@ -38,3 +40,7 @@
         smudge = git-lfs smudge -- %f
         process = git-lfs filter-process
         required = true
+[remote "origin"]
+	prune = true
+[credential]
+	helper = store
