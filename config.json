@@ -73,6 +73,7 @@
         "user/local/bin/screen-layout.sh": "~/.local/bin/screen-layout.sh",
         "user/Xresources": "~/.Xresources",
         "user/zshrc": "~/.zshrc",
+        "user/cargo/config.toml": "~/.cargo/config.toml",
         "vendor/i3blocks-contrib": "~/.config/i3blocks/i3blocks-contrib",
         "vendor/oh-my-zsh": "~/.oh-my-zsh"
     },
